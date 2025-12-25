@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Казанский храм</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="main-container">
+        <div class="container">
+            <div class="left-section">
+                <img src="{{ url_for('static', filename='images/temple.jpg') }}" alt="Казанский храм" class="temple-photo">
+            </div>
+            
+            <div class="right-section">
+                <h1 class="temple-title">Казанский храм</h1>
+                
+                <div class="icons-container">
+                    <img src="{{ url_for('static', filename='images/icon1.jpg') }}" alt="Икона 1" class="icon">
+                    <img src="{{ url_for('static', filename='images/icon2.jpg') }}" alt="Икона 2" class="icon">
+                </div>
+                
+                <nav class="navigation">
+                    <a href="{{ url_for('about') }}" class="nav-button">О храме</a>
+                    <a href="{{ url_for('clergy') }}" class="nav-button">Духовенство</a>
+                    <a href="{{ url_for('schedule') }}" class="nav-button">Расписание богослужений</a>
+                    <a href="{{ url_for('contacts') }}" class="nav-button">Контакты</a>
+                    <a href="{{ url_for('photos') }}" class="nav-button">Фото</a>
+                    <a href="{{ url_for('shrines') }}" class="nav-button">Святыни</a>
+                    <a href="{{ url_for('donate') }}" class="nav-button">Помощь храму</a>
+                </nav>
+            </div>
+        </div>
+        
+        <footer class="footer">
+            <div class="footer-content">
+                Официальный сайт Казанского храма Калужской епархии Московского Патриархата
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

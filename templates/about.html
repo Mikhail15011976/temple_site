@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Информация - Казанский храм</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="about-container">
+        <header class="about-header">
+            <h1>Казанский храм</h1>
+            <a href="{{ url_for('index') }}" class="back-button">← На главную</a>
+        </header>
+
+        <nav class="about-navigation">
+            <a href="{{ url_for('about') }}" class="nav-button {% if section == 'about' %}active{% endif %}">О храме</a>
+            <a href="{{ url_for('clergy') }}" class="nav-button {% if section == 'clergy' %}active{% endif %}">Духовенство</a>
+            <a href="{{ url_for('schedule') }}" class="nav-button {% if section == 'schedule' %}active{% endif %}">Расписание богослужений</a>
+            <a href="{{ url_for('contacts') }}" class="nav-button {% if section == 'contacts' %}active{% endif %}">Контакты</a>
+            <a href="{{ url_for('photos') }}" class="nav-button {% if section == 'photos' %}active{% endif %}">Фото</a>
+            <a href="{{ url_for('shrines') }}" class="nav-button {% if section == 'shrines' %}active{% endif %}">Святыни</a>
+            <a href="{{ url_for('donate') }}" class="nav-button {% if section == 'donate' %}active{% endif %}">Помощь храму</a>
+        </nav>
+
+        <main class="content">
+            {% if section == 'about' %}
+            <section class="info-section">
+                <h2>О храме</h2>
+                <p>Поселок Октябрьский образован в 1976г. Градообразующее предприятие поселка ОАО "Племзавод Октябрьский". Храма здесь никогда не было. Решение о строительстве храма было принято после письменного обращения жителей поселка к правящему архиерею. С 2009 года храм начал строиться силами местного сельхозпредприятия "ОАО Племзавод Октябрьский". В 2014г. состоялось освящение храма митр. Калужским и Боровским Климентом. С тех пор службы совершаются регулярно.</p>
+                <p>Храм состоит из центрального четверика с алтарем и трапезной частью. Иконостас дубовый, инкрустирован басмой. Главной святыней храма является Чудотворная мироточивая икона Пресвятой Богородицы и частица Плата, освященного на Ризе Пресвятой Богородицы. Второй святыней храма является Чудотворная икона блж. Иоанна Тульского с мощами святого.</p>
+            </section>
+
+            {% elif section == 'clergy' %}
+            <section class="info-section">
+                <h2>Духовенство</h2>                
+                <p><strong>Настоятель:</strong> протоиерей Михаил Бабков</p>
+                <p><strong>Телефон:</strong> +7 (910) 604-43-19</p>
+            </section>
+
+            {% elif section == 'schedule' %}
+            <section class="info-section">
+                <h2>Расписание богослужений</h2>
+                <p><strong>Воскресенье:</strong> Литургия - 9:00</p>
+                <p><strong>Среда:</strong> Вечерня с акафистом Божией Матери - 17.00</p>
+                <p><strong>По будням служим по праздникам:</strong> Вечернее богослужение - 17.00, Литургия - 8.30</p>
+                <p>Точное расписание публикуется в группе телеграмм
+                    <a href="https://t.me/c/1727599325/1" target="_blank" class="contact-link">https://t.me/c/1727599325/1</a>
+                </p>
+            </section>
+
+            {% elif section == 'contacts' %}
+            <section class="info-section">
+                <h2>Контакты</h2>
+                <p><strong>Адрес:</strong> Калужская обл., Ферзиковский район, пос. Октябрьский, д. 1а</p>                
+                <p><strong>Настоятель прот. Михаил:</strong> +79106044319</p>
+                <p><strong>Староста:</strong> Нина +79005731782</p>                                
+                <p><strong>Email:</strong> 
+                    <a href="mailto:mikhail.babkov@yandex.ru" class="contact-link">mikhail.babkov@yandex.ru</a>
+                </p>
+                <p><strong>Группа в телеграмм:</strong> 
+                    <a href="https://t.me/c/1727599325/1" target="_blank" class="contact-link">https://t.me/c/1727599325/1</a>
+                </p>
+                <p><strong>Навигация:</strong> 
+                    <a href="https://yandex.ru/maps/?pt=36.772368,54.357098&z=17&l=map" target="_blank" class="contact-link">54.357098, 36.772368</a>
+                    <span class="nav-links">
+                        <a href="https://yandex.ru/maps/?pt=36.772368,54.357098&z=17&l=map" target="_blank" class="nav-app">Яндекс Карты</a>
+                        <a href="https://maps.google.com/?q=54.357098,36.772368" target="_blank" class="nav-app">Google Maps</a>
+                    </span>
+                </p>
+            </section>
+
+            {% elif section == 'photos' %}
+            <section class="info-section">
+                <h2>Фотогалерея</h2>
+                <div class="photo-gallery">
+                    <div class="photo-item">
+                        <img src="{{ url_for('static', filename='images/photo1.jpg') }}" alt="Фото храма 1" onclick="openModal(this)">                        
+                    </div>
+                    <div class="photo-item">
+                        <img src="{{ url_for('static', filename='images/photo2.jpg') }}" alt="Фото храма 2" onclick="openModal(this)">                        
+                    </div>
+                    <div class="photo-item">
+                        <img src="{{ url_for('static', filename='images/photo3.jpg') }}" alt="Фото храма 3" onclick="openModal(this)">                        
+                    </div>
+                    <div class="photo-item">
+                        <img src="{{ url_for('static', filename='images/photo4.jpg') }}" alt="Фото храма 4" onclick="openModal(this)">                        
+                    </div>
+                    <div class="photo-item">
+                        <img src="{{ url_for('static', filename='images/photo5.jpg') }}" alt="Фото храма 5" onclick="openModal(this)">                        
+                    </div>
+                    <div class="photo-item">
+                        <img src="{{ url_for('static', filename='images/photo6.jpg') }}" alt="Фото храма 6" onclick="openModal(this)">                        
+                    </div>
+                    <div class="photo-item">
+                        <img src="{{ url_for('static', filename='images/photo7.jpg') }}" alt="Фото храма 7" onclick="openModal(this)">                        
+                    </div>
+                    <div class="photo-item">
+                        <img src="{{ url_for('static', filename='images/photo8.jpg') }}" alt="Фото храма 8" onclick="openModal(this)">                        
+                    </div>
+                    <div class="photo-item">
+                        <img src="{{ url_for('static', filename='images/photo9.jpg') }}" alt="Фото храма 9" onclick="openModal(this)">                        
+                    </div>
+                    <div class="photo-item">
+                        <img src="{{ url_for('static', filename='images/photo10.jpg') }}" alt="Фото храма 10" onclick="openModal(this)">                        
+                    </div>
+                </div>
+            </section>
+
+            <!-- Модальное окно для полноэкранного просмотра -->
+            <div id="imageModal" class="modal">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <img class="modal-content" id="modalImage">
+                <div class="modal-caption" id="modalCaption"></div>
+                
+                <!-- Кнопки навигации -->
+                <button class="modal-nav prev" onclick="changeImage(-1)">&#10094;</button>
+                <button class="modal-nav next" onclick="changeImage(1)">&#10095;</button>
+            </div>
+
+            <script>
+            let currentImageIndex = 0;
+            const images = document.querySelectorAll('.photo-item img');
+            const imageSources = Array.from(images).map(img => img.src);
+            const imageCaptions = Array.from(images).map(img => img.alt);
+
+            function openModal(img) {
+                currentImageIndex = Array.from(images).indexOf(img);
+                document.getElementById('imageModal').style.display = 'block';
+                document.getElementById('modalImage').src = img.src;
+                document.getElementById('modalCaption').textContent = img.alt;
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeModal() {
+                document.getElementById('imageModal').style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+
+            function changeImage(direction) {
+                currentImageIndex += direction;
+                
+                if (currentImageIndex >= images.length) {
+                    currentImageIndex = 0;
+                } else if (currentImageIndex < 0) {
+                    currentImageIndex = images.length - 1;
+                }
+                
+                document.getElementById('modalImage').src = imageSources[currentImageIndex];
+                document.getElementById('modalCaption').textContent = imageCaptions[currentImageIndex];
+            }
+
+            // Закрытие по клику вне изображения
+            document.getElementById('imageModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal();
+                }
+            });
+
+            // Закрытие по ESC
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeModal();
+                } else if (e.key === 'ArrowLeft') {
+                    changeImage(-1);
+                } else if (e.key === 'ArrowRight') {
+                    changeImage(1);
+                }
+            });
+            </script>
+
+            {% elif section == 'shrines' %}
+            <section class="info-section">
+                <h2>Святыни храма</h2>
+                <div class="shrines-gallery">
+                    <div class="shrine-item">
+                        <img src="{{ url_for('static', filename='images/shrine1.jpg') }}" 
+                             alt="Чудотворная мироточивая Казанская икона Божией Матери" 
+                             onclick="openShrinesModal(this)">
+                        <p>Чудотворная мироточивая Казанская икона Божией Матери</p>
+                    </div>
+                    <div class="shrine-item">
+                        <img src="{{ url_for('static', filename='images/shrine2.jpg') }}" 
+                             alt="Частица плата, приложенного к Ризе Божией Матери" 
+                             onclick="openShrinesModal(this)">
+                        <p>Частица плата, освященная на Ризе Божией Матери</p>
+                    </div>
+                    <div class="shrine-item">
+                        <img src="{{ url_for('static', filename='images/shrine3.jpg') }}" 
+                             alt="Чудотворная икона блж. Иоанна Тульского" 
+                             onclick="openShrinesModal(this)">
+                        <p>Чудотворная икона блж. Иоанна Тульского</p>
+                    </div>
+                    <div class="shrine-item">
+                        <img src="{{ url_for('static', filename='images/shrine4.jpg') }}" 
+                             alt="Мощи святого блж. Иоанна Тульского" 
+                             onclick="openShrinesModal(this)">
+                        <p>Мощи святого блж. Иоанна Тульского</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Модальное окно для святынь -->
+            <div id="shrinesModal" class="modal">
+                <span class="close" onclick="closeShrinesModal()">&times;</span>
+                <img class="modal-content" id="shrinesModalImage">
+                <div class="modal-caption" id="shrinesModalCaption"></div>
+                
+                <!-- Кнопки навигации -->
+                <button class="modal-nav prev" onclick="changeShrinesImage(-1)">&#10094;</button>
+                <button class="modal-nav next" onclick="changeShrinesImage(1)">&#10095;</button>
+            </div>
+
+            <script>
+            // Переменные для галереи святынь
+            let currentShrineIndex = 0;
+            const shrineImages = document.querySelectorAll('.shrines-gallery img');
+            const shrineSources = Array.from(shrineImages).map(img => img.src);
+            const shrineCaptions = Array.from(shrineImages).map(img => img.alt);
+
+            function openShrinesModal(img) {
+                currentShrineIndex = Array.from(shrineImages).indexOf(img);
+                document.getElementById('shrinesModal').style.display = 'block';
+                document.getElementById('shrinesModalImage').src = img.src;
+                document.getElementById('shrinesModalCaption').textContent = img.alt;
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeShrinesModal() {
+                document.getElementById('shrinesModal').style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+
+            function changeShrinesImage(direction) {
+                currentShrineIndex += direction;
+                
+                if (currentShrineIndex >= shrineImages.length) {
+                    currentShrineIndex = 0;
+                } else if (currentShrineIndex < 0) {
+                    currentShrineIndex = shrineImages.length - 1;
+                }
+                
+                document.getElementById('shrinesModalImage').src = shrineSources[currentShrineIndex];
+                document.getElementById('shrinesModalCaption').textContent = shrineCaptions[currentShrineIndex];
+            }
+
+            // Закрытие по клику вне изображения
+            document.getElementById('shrinesModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeShrinesModal();
+                }
+            });
+
+            // Управление клавиатурой для святынь
+            document.addEventListener('keydown', function(e) {
+                if (document.getElementById('shrinesModal').style.display === 'block') {
+                    if (e.key === 'Escape') {
+                        closeShrinesModal();
+                    } else if (e.key === 'ArrowLeft') {
+                        changeShrinesImage(-1);
+                    } else if (e.key === 'ArrowRight') {
+                        changeShrinesImage(1);
+                    }
+                }
+            });
+            </script>
+
+            {% elif section == 'donate' %}
+            <section class="info-section">
+                <h2>Помощь храму</h2>
+                
+                <div class="donation-content">
+                    <div class="donation-text">
+                        <p>Ваша помощь необходима для поддержания и развития храма. Любое пожертвование будет принято с благодарностью и молитвой.</p>
+                        
+                        <div class="urgent-project">
+                            <div class="donation-method" style="background: linear-gradient(135deg, #ffe6e6, #ffcccc); border-left: 4px solid #ff3333;">
+                                <h3 style="color: #cc0000;">🚨 СРОЧНЫЙ ПРОЕКТ: ВОДООТВЕДЕНИЕ</h3>
+                                <p><strong>Храму необходимо сделать систему водоотведения</strong></p>
+                                <p><strong>Сумма проекта:</strong> 6 000 000 рублей</p>
+                                <p><strong>Статус проекта:</strong> Все документы готовы, ожидается финансирование</p>
+                                <p>Пожертвования на этот проект можно направлять по реквизитам храма с пометкой "На водоотведение"</p>
+                            </div>
+                        </div>
+                        
+                        <div class="donation-methods">
+                            <div class="donation-method">
+                                <h3>🏛️ Реквизиты храма для банковских переводов</h3>
+                                <p><strong>Полное наименование:</strong> {{ requisites.full_name }}</p>
+                                <p><strong>ИНН:</strong> {{ requisites.inn }}</p>
+                                <p><strong>КПП:</strong> {{ requisites.kpp }}</p>
+                                <p><strong>Расчетный счет:</strong> {{ requisites.account_number }}</p>
+                                <p><strong>Банк получателя:</strong> Россельхозбанк</p>
+                                <p><strong>Корреспондентский счет:</strong> {{ requisites.correspondent_account }}</p>
+                                <p><strong>БИК:</strong> {{ requisites.bik }}</p>
+                                <p><strong>Назначение платежа:</strong> Пожертвование на содержание храма</p>
+                            </div>
+                            
+                            <div class="donation-method">
+                                <h3>📱 Перевод на карту настоятеля</h3>
+                                <p><strong>Россельхозбанк:</strong> +7 (910) 604-43-19 Михаил Б.</p>
+                                <p>(указать "Пожертвование на храм" или "На водоотведение")</p>
+                            </div>
+                            
+                            <div class="donation-method">
+                                <h3>💵 Лично в храме</h3>
+                                <p>Вы можете оставить пожертвование в специальном ящике в храме</p>
+                                <p>Помечайте конверт "На водоотведение" для целевых пожертвований</p>
+                            </div>
+                        </div>
+                        
+                        <div class="donation-notice">
+                            <p><strong>Все пожертвования идут на:</strong></p>
+                            <ul>
+                                <li>Срочный проект: система водоотведения (6 млн рублей)</li>
+                                <li>Содержание и ремонт храма</li>
+                                <li>Приобретение церковной утвари</li>
+                                <li>Оплату коммунальных услуг</li>
+                                <li>Организацию богослужений</li>
+                            </ul>
+                        </div>
+                        
+                        <p class="prayer-text">Да воздаст Вам Господь за вашу помощь и милосердие!</p>
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+        </main>
+    </div>
+</body>
+</html>
