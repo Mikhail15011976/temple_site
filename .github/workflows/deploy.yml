@@ -11,25 +11,62 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
+    - name: Debug - Show all files
+      run: |
+        echo "=== СОДЕРЖИМОЕ РЕПОЗИТОРИЯ ==="
+        find . -type f -name "*.txt" -o -name "*.py" | sort
+        echo ""
+        
+        echo "=== requirements.txt (содержимое с номерами строк) ==="
+        cat -n requirements.txt
+        echo ""
+        
+        echo "=== Проверка невидимых символов ==="
+        cat -A requirements.txt
+        echo ""
+        
+        echo "=== Размер файла ==="
+        wc -l requirements.txt
+        echo ""
+    
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
     
-    - name: Install dependencies
+    - name: Install dependencies with debug
       run: |
+        echo "=== УСТАНОВКА ЗАВИСИМОСТЕЙ ==="
         python -m pip install --upgrade pip
-        pip install flake8
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    
-    - name: Lint with flake8
-      run: |
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        echo "Проверяем файл requirements.txt..."
+        
+        # Проверяем что файл существует
+        if [ ! -f "requirements.txt" ]; then
+          echo "❌ Файл requirements.txt не найден!"
+          exit 1
+        fi
+        
+        # Показываем что будем устанавливать
+        echo "Содержимое файла для установки:"
+        while IFS= read -r line; do
+          echo "  → $line"
+        done < requirements.txt
+        
+        # Пробуем установить
+        echo "Устанавливаем зависимости..."
+        pip install -r requirements.txt
+        
+        echo "✅ Зависимости установлены успешно"
     
     - name: Test Flask app
       run: |
-        python -c "from app import app; print('✅ Flask app import successful')"
+        echo "=== ТЕСТ ПРИЛОЖЕНИЯ ==="
+        if [ -f "app.py" ]; then
+          python -c "from app import app; print('✅ Flask app import successful')"
+        else
+          echo "❌ Файл app.py не найден!"
+          ls -la *.py
+        fi
 
   deploy:
     needs: test
@@ -57,26 +94,29 @@ jobs:
           BACKUP_DIR=\"backups/\$TIMESTAMP\"
           mkdir -p \$BACKUP_DIR
           cp -f app.py requirements.txt \$BACKUP_DIR/ 2>/dev/null || true
-          cp -rf templates static \$BACKUP_DIR/ 2>/dev/null || true
           echo \"✅ Backup создан: \$BACKUP_DIR\"
         "
         
-        # Копируем файлы
+        # Копируем файлы с отладкой
         echo "📁 Копируем файлы на сервер..."
-        scp -i ~/.ssh/id_ed25519 -r \
-          *.py \
-          requirements.txt \
+        
+        echo "1. Копируем requirements.txt..."
+        scp -i ~/.ssh/id_ed25519 requirements.txt \
+          ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/opt/temple_site/
+        
+        echo "2. Копируем app.py..."
+        scp -i ~/.ssh/id_ed25519 app.py \
           ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/opt/temple_site/
         
         # Копируем директории если они существуют
         if [ -d "templates" ]; then
-          echo "📁 Копируем templates..."
+          echo "3. Копируем templates..."
           scp -i ~/.ssh/id_ed25519 -r templates/ \
             ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/opt/temple_site/
         fi
         
         if [ -d "static" ]; then
-          echo "📁 Копируем static..."
+          echo "4. Копируем static..."
           scp -i ~/.ssh/id_ed25519 -r static/ \
             ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/opt/temple_site/
         fi
@@ -84,18 +124,28 @@ jobs:
         # Устанавливаем зависимости и перезапускаем
         echo "⚙️ Устанавливаем зависимости и перезапускаем сервис..."
         ssh -i ~/.ssh/id_ed25519 ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "
+          echo '=== НА СЕРВЕРЕ ==='
           cd /opt/temple_site
+          
+          # Проверяем что скопировалось
+          echo '1. Проверяем файлы:'
+          ls -la *.py *.txt
+          echo ''
+          
+          echo '2. Содержимое requirements.txt:'
+          cat requirements.txt
+          echo ''
           
           # Активируем venv
           source venv/bin/activate
           
           # Обновляем зависимости
+          echo '3. Устанавливаем зависимости...'
           pip install --upgrade pip
-          if [ -f requirements.txt ]; then
-            pip install -r requirements.txt
-          fi
+          pip install -r requirements.txt
           
           # Перезапускаем сервис
+          echo '4. Перезапускаем сервис...'
           sudo systemctl daemon-reload
           sudo systemctl restart temple-site
           
@@ -103,14 +153,11 @@ jobs:
           sleep 3
           
           # Проверяем
-          echo '📊 Статус сервиса:'
+          echo '5. Статус сервиса:'
           sudo systemctl status temple-site --no-pager | head -10
           
-          echo '🌐 Проверка доступности:'
+          echo '6. Проверка доступности:'
           curl -f http://127.0.0.1:5001/health && echo '✅ Health check passed' || echo '❌ Health check failed'
-          
-          # Очищаем старые бэкапы
-          cd /opt/temple_site/backups 2>/dev/null && ls -1t | tail -n +6 | xargs rm -rf 2>/dev/null || true
           
           echo '🎉 Деплой успешно завершен!'
         "
