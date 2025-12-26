@@ -1,4 +1,5 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
+import datetime
 
 app = Flask(__name__)
 
@@ -44,5 +45,14 @@ def shrines():
 def donate():
     return render_template('about.html', section='donate', requisites=TEMPLE_REQUISITES)
 
+# Health check для мониторинга
+@app.route('/health')
+def health():
+    return jsonify({
+        'status': 'healthy',
+        'service': 'temple-site',
+        'timestamp': datetime.datetime.now().isoformat()
+    })
+
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=False, host='127.0.0.1', port=5001)
