@@ -1,0 +1,116 @@
+name: Deploy Temple Site
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    
+    - name: Lint with flake8
+      run: |
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    
+    - name: Test Flask app
+      run: |
+        python -c "from app import app; print('✅ Flask app import successful')"
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup SSH
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+        chmod 600 ~/.ssh/id_ed25519
+        ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+    
+    - name: Deploy to server
+      run: |
+        echo "🚀 Начинаем деплой на сервер..."
+        
+        # Создаем backup
+        ssh -i ~/.ssh/id_ed25519 ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "
+          cd /opt/temple_site
+          TIMESTAMP=\$(date +%Y%m%d_%H%M%S)
+          BACKUP_DIR=\"backups/\$TIMESTAMP\"
+          mkdir -p \$BACKUP_DIR
+          cp -f app.py requirements.txt \$BACKUP_DIR/ 2>/dev/null || true
+          cp -rf templates static \$BACKUP_DIR/ 2>/dev/null || true
+          echo \"✅ Backup создан: \$BACKUP_DIR\"
+        "
+        
+        # Копируем файлы
+        echo "📁 Копируем файлы на сервер..."
+        scp -i ~/.ssh/id_ed25519 -r \
+          *.py \
+          requirements.txt \
+          ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/opt/temple_site/
+        
+        # Копируем директории если они существуют
+        if [ -d "templates" ]; then
+          echo "📁 Копируем templates..."
+          scp -i ~/.ssh/id_ed25519 -r templates/ \
+            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/opt/temple_site/
+        fi
+        
+        if [ -d "static" ]; then
+          echo "📁 Копируем static..."
+          scp -i ~/.ssh/id_ed25519 -r static/ \
+            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/opt/temple_site/
+        fi
+        
+        # Устанавливаем зависимости и перезапускаем
+        echo "⚙️ Устанавливаем зависимости и перезапускаем сервис..."
+        ssh -i ~/.ssh/id_ed25519 ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "
+          cd /opt/temple_site
+          
+          # Активируем venv
+          source venv/bin/activate
+          
+          # Обновляем зависимости
+          pip install --upgrade pip
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+          
+          # Перезапускаем сервис
+          sudo systemctl daemon-reload
+          sudo systemctl restart temple-site
+          
+          # Ждем запуска
+          sleep 3
+          
+          # Проверяем
+          echo '📊 Статус сервиса:'
+          sudo systemctl status temple-site --no-pager | head -10
+          
+          echo '🌐 Проверка доступности:'
+          curl -f http://127.0.0.1:5001/health && echo '✅ Health check passed' || echo '❌ Health check failed'
+          
+          # Очищаем старые бэкапы
+          cd /opt/temple_site/backups 2>/dev/null && ls -1t | tail -n +6 | xargs rm -rf 2>/dev/null || true
+          
+          echo '🎉 Деплой успешно завершен!'
+        "
